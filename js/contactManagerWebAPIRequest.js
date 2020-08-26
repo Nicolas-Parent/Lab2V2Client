@@ -36,6 +36,7 @@ function webAPI_addContact( contact, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL,
         type: 'POST',
+        contentType:'application/json',
         data: JSON.stringify(contact),
         success: () => {successCallBack();  console.log("webAPI_addContact - success");},
         error: function(jqXHR, textStatus, errorThrown) {
@@ -50,6 +51,7 @@ function webAPI_modifyContact( contact, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + contact.Id,
         type: 'PUT',
+        contentType:'application/json',
         data: JSON.stringify(contact),
         success:() => {successCallBack();  console.log("webAPI_modifyContact - success");},
         error: function(jqXHR, textStatus, errorThrown) {
