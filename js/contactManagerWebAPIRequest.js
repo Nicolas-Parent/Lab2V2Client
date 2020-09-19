@@ -8,6 +8,7 @@ function webAPI_getContacts( successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL,
         type: 'GET',
+        contentType:'text/plain',
         data:{},
         success: contacts => {  successCallBack(contacts);
                                 console.log("webAPI_getContacts - success");},
@@ -22,6 +23,7 @@ function webAPI_getContact( id, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + id,
         type: 'GET',
+        contentType:'text/plain',
         data:{},
         success: contact => { successCallBack(contact); console.log("webAPI_getContact - success");},
         error: function(jqXHR, textStatus, errorThrown) {
@@ -64,6 +66,7 @@ function webAPI_modifyContact( contact, successCallBack, errorCallBack) {
 function webAPI_deleteContact( id, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL+"/" + id,
+        contentType:'text/plain',
         type: 'DELETE',
         success:() => {successCallBack();  console.log("webAPI_deleteContact - success");},
         error: function(jqXHR, textStatus, errorThrown) {
