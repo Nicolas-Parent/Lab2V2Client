@@ -2,7 +2,8 @@
     Méthodes d'accès aux services Web API ContactsManager
  */
 
-const apiBaseURL= "http://localhost:5000/api/Contacts";
+//const apiBaseURL= "http://localhost:5000/api/Contacts";
+const apiBaseURL= "https://three-ethereal-castanet.glitch.me/api/contacts";
 
 function webAPI_getContacts( successCallBack, errorCallBack) {
     $.ajax({
