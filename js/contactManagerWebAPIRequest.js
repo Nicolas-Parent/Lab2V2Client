@@ -76,3 +76,17 @@ function webAPI_deleteContact( id, successCallBack, errorCallBack) {
         }
     });
 }
+function webAPI_GET_ETAG(successCallBack, errorCallBack) {
+  $.ajax({
+    url: apiBaseURL + "/api/bookmarks",
+    type: "HEAD",
+    contentType: "text/plain",
+    complete: function (request) {
+      successCallBack(request.getResponseHeader("ETag"));
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      errorCallBack(jqXHR.status);
+      console.log("webAPI_GET_ETAG - error");
+    },
+  });
+}

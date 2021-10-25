@@ -1,16 +1,12 @@
 <!--
 
-    Démonstration d'une page web cliente du service Web API Contacts (hébergé sur un des serveurs du collège)
+    Démonstration d'une page web cliente du service Web API Contacts
     Cette page offre les opérations CRUD sur une liste de contacts conservée dans une base de données du serveur.
 
     C - Create - POST
     R - Read   - GET
     U - Update - PUT
     D - Delete - DELETE
-
-
-    IMPORTANT: Ne pas distribuer aux étudiants sans avis contraire.
-    Ceci est un premier jet et sera sûrement modifié d'ici peu.
 
     Code de la page : Nicolas Chourot
     Service Web API : Nicolas Chourot
@@ -45,7 +41,10 @@
     <body>
         <!-- Entête de la liste de contact -->
         <div class="container">
-            <h3><img src="favicon.ico">&nbsp;Gestionnaire de contacts</h3>
+            <div class="appHeader">
+                <h1><img src="favicon.ico">&nbsp;Gestionnaire de contacts</h1>
+            </div>
+            
             <div class="array-container">
                 <div class="header-container">
                     <div class="header-contacts-container">
@@ -53,7 +52,7 @@
                         <div>Téléphone</div>
                         <div>Courriel</div>
                         <div>
-                            <button id="showAddContact"
+                            <button id="showAddContactFormCmd"
                                     tooltip="Ajouter un contact" tooltip-position="left">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </button>
@@ -66,12 +65,12 @@
                         <!--
                         Formulaire de saisie/modification de contact:
                         Contient les contrôles de saisie de contact.
-                        Notez qu'elle sera masquée et n'apparaitra que dans le mode d'ajout ou modification
+                        Notez qu'il sera masqué et n'apparaitra que dans le mode d'ajout ou modification
                         de contact.
                         -->
+                        <!-- champ masqué qui recevra le id d'un contact à modifier -->
+                        <input type="hidden" id="Id" />
                         <div>
-                            <!-- champ masqué qui recevra le id d'un contact à modifier -->
-                            <input type="hidden" id="Id" />
                             <input type="text" id="Name" placeholder="Nom" class="form-control"/>
                         </div>
                         <div>
@@ -81,17 +80,19 @@
                             <input type="text" id="Email" placeholder="Courriel" class="form-control"/>
                         </div>
                         <div>
+                            <!-- Noter que un seul des boutons suivants sera affiché selon le mode d'ajout ou de modification -->
                             <!-- bouton de commande d'ajout de contact -->
-                            <button id="addContact" tooltip="Ajouter" tooltip-position="left">
+                            <button id="addContactCmd" tooltip="Ajouter" tooltip-position="left">
                                 <span class="glyphicon glyphicon glyphicon-ok"></span>
                             </button>
                             <!-- bouton de commande de modification de contact -->
-                            <button id="modifyContact" tooltip="Modifier" tooltip-position="left">
+                            <button id="modifyContactCmd" tooltip="Modifier" tooltip-position="left">
                                 <span class="glyphicon glyphicon-ok"></span>
                             </button>
                         </div>
                         <div>
-                            <button id="cancel" tooltip="Annuler" tooltip-position="left">
+                            <!-- bouton de commande d'annulation d'ajout ou de modification de contact -->
+                            <button id="cancelCmd" tooltip="Annuler" tooltip-position="left">
                                 <span  class="glyphicon glyphicon-repeat"></span>
                             </button>
                         </div>
@@ -99,7 +100,8 @@
                 </div>
                 <div class="contact-list-scroll-containter">
                     <div class="contact-list-container" id="contactList">
-                        <!-- La liste de contacts sera injectée ici par du JavaScript -->
+                        <!-- La liste de contacts sera injectée ici par 
+                             la fonction JavaScript updateContactList(...) -->
                     </div>
                 </div>
             </div>
@@ -133,10 +135,10 @@
                 eraseForm();
 
                 // Gestionnaires du clic sur les boutons
-                $('#addContact').click(addContact);
-                $('#showAddContact').click(showAddContact);
-                $('#modifyContact').click(modifyContact);
-                $('#cancel').click(eraseForm);
+                $('#addContactCmd').click(addContact);
+                $('#showAddContactFormCmd').click(showAddContactForm);
+                $('#modifyContactCmd').click(modifyContact);
+                $('#cancelCmd').click(eraseForm);
                 $('#Name').keypress(textInputAlphaFilter);
 
                 // Ajout d'un message d'attente de réponse du serveur.
@@ -149,7 +151,7 @@
             }
 
             function insertWaitingStatus(){
-                $('#contactList').empty()
+                $('#contactList').empty();
                 $('#contactList').append(  makeCell("En attente de réponse du service Web...", "waiting"));
                 $('#contactList').append($('<img src="images/Loading_icon.gif" alt="waiting"/>'));
             }
@@ -215,12 +217,12 @@
                 $('.cell').removeClass('selectedRow');
 
                 // masquer le formulaire de saisie/modification de contact
-                $('#contactForm').hide();
+                $('#contactForm').hide(400);
 
                 // Rétablir la visibilité par défaut des boutons
-                $('#addContact').show();
-                $('#modifyContact').hide();
-                $('#showAddContact').show();
+                $('#addContactCmd').show();
+                $('#modifyContactCmd').hide();
+                $('#showAddContactFormCmd').show();
 
                 // Effacer les champs du formulaire
                 $('#Name').val('');
@@ -238,32 +240,33 @@
             }
 
             // Afficher le formulaire pour la saisie de contact
-            function showAddContact() {
+            function showAddContactForm() {
                 addMode = true;
-                $('#contactForm').show();
-                $('#showAddContact').hide();
+                $('#addContactCmd').show();
+                $('#contactForm').show(400);
+                $('#showAddContactFormCmd').hide();
             }
 
             // Afficher le formulaire pour la modification de contact
-            function showEditContact(e){
+            function showEditContactForm(e){
                 editMode = true;
-                $('#showAddContact').hide();
-                $('#addContact').hide();
-                $('#contactForm').show();
+                $('#addContactCmd').hide();
+                $('#showAddContactFormCmd').hide();
+                $('#contactForm').show(400);
 
                 let contactId = e.currentTarget.id.split('_')[1];
 
                 // Extraction du contact de Id = contactId via le service web API
-                webAPI_getContact(contactId, ShowForm);
+                webAPI_getContact(contactId, setFormData);
             }
 
-            function ShowForm(contact) {
+            function setFormData(contact) {
                 // peupler les contrôles de saisie
                 $('#Id').val(contact.Id); // input caché qui mémorise le Id du contact
                 $('#Name').val(contact.Name);
                 $('#Phone').val(contact.Phone);
                 $('#Email').val(contact.Email);
-                $('#modifyContact').show();
+                $('#modifyContactCmd').show();
             }
 
             // Retourne un objet contact à partir des valeurs prélevées se trouvant dans les contrôles de saisie.
@@ -314,6 +317,7 @@
                 });
             }
 
+            // Sur le survol d'une rangée, faire apparaître les boutons edit et delete
             function cellOver(e){
                 if (!addMode && !editMode) {
                     // currentTarget.className contient en principe : 'row_x cell ...'
@@ -323,6 +327,8 @@
                     $('.row_'+contactId).addClass('selectedRow');
                 }
             }
+
+            // Sur le l'évacuation d'une rangée, faire disparaître les boutons edit et delete
             function cellBlur(e){
                 if (!editMode) {
                     // currentTarget.className contient en principe : 'row_x cell ...'
@@ -333,8 +339,12 @@
                 }
             }
 
-            function makeCell(content, cssClass){
+            function makeTextCell(content, cssClass){
                 return $('<div class= "' + cssClass + '">' + content + '</div>');
+            }
+
+            function makeCell(cssClass){
+                return $('<div class= "' + cssClass + '"></div>');
             }
 
             function makeButton(cssClass, id, tooltip) {
@@ -357,35 +367,36 @@
                 contacts.forEach(contact => { // créer une nouvelle rangée
 
                     // déterminer la couleur de la rangée
-                    let bgColorRow = "row_" + contact.Id + " cell " + (oddRow?  "oddRow": "evenRow") ;
+                    let bgColorRow = "row_" + contact.Id + (oddRow?  " oddRow": " evenRow") + " cell "  ;
 
                     // Distribution des données du contact dans des cellules de la rangée
-                    $('#contactList').append(makeCell(contact.Name, bgColorRow ));
-                    $('#contactList').append(makeCell(contact.Phone, bgColorRow));
-                    $('#contactList').append(makeCell(contact.Email, bgColorRow));
+                    $('#contactList').append(makeTextCell(contact.Name,  bgColorRow + " ellipsis"));
+                    $('#contactList').append(makeTextCell(contact.Phone, bgColorRow + " ellipsis"));
+                    $('#contactList').append(makeTextCell(contact.Email, bgColorRow + " ellipsis"));
 
                     // Bouton d'appel à la modification du contact
-                    $('#contactList').append(
-                        makeCell("", bgColorRow).append(
-                            makeButton("editContact","edit_" + contact.Id ,"Modifier "+ contact.Name).append(
-                                makeGlyphIcon('pencil'))));
+                    $('#contactList')
+                        .append(makeCell(bgColorRow)
+                        .append(makeButton("editContactCmd", "edit_" + contact.Id ,"Modifier " + contact.Name)
+                        .append(makeGlyphIcon('pencil'))));
 
                     // Bouton d'appel au retrait du contact
-                    $('#contactList').append(
-                        makeCell("", bgColorRow).append(
-                            makeButton("deleteContact","delete_" + contact.Id ,"Effacer "+ contact.Name).append(
-                                makeGlyphIcon('remove'))));
+                    $('#contactList')
+                        .append(makeCell(bgColorRow)
+                        .append(makeButton("deleteContactCmd", "delete_" + contact.Id ,"Effacer " + contact.Name)
+                        .append(makeGlyphIcon('remove'))));
 
                     oddRow = !oddRow;
                });
 
                // Attacher les gestionnaires du clic aux nouveaux boutons
-               $('.editContact').click(showEditContact);
-               $('.deleteContact').click(deleteContact);
+               $('.editContactCmd').click(showEditContactForm);
+               $('.deleteContactCmd').click(deleteContact);
                $('#contactList button').hide();
                $('input').on("paste",function(e) { e.preventDefault(); });
 
-               // Attacher les événements pour mettre en surbrillance une rangée survolée
+               // Attacher les événements pour mettre en surbrillance la rangée survolée
+               // et faire apparaitre les icons d'édition et de retrait
                $('.cell').mouseover(cellOver);
                $('.cell').mouseleave(cellBlur);
             }

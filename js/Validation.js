@@ -1,6 +1,5 @@
 // auteur: Nicolas Chourot
 
-
 //
 // Call back de keypress pour retenir uniquement les caractères alphabétiques
 //
@@ -134,7 +133,6 @@ class ValidationProvider{
     }
 
     // ajout d'un ValidationControl
-    // todo: ajouter la référence sur un tâche de validation à la soumission
     addControl(elementId, validationTask){
         let validationControl = new ValidationControl(elementId, validationTask);
         if (validationControl.domElement != null && (validationTask != undefined || validationTask != null)) {
